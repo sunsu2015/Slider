@@ -21548,6 +21548,7 @@
 	    }, {
 	        key: 'pausePlay',
 	        value: function pausePlay() {
+	            console.log('pausePlay');
 	            clearInterval(this.autoPlayFlag);
 	        }
 	    }, {
@@ -21584,6 +21585,7 @@
 	                    onMouseOut: this.props.pause ? this.autoPlay.bind(this) : null,
 	                    onTouchStart: function onTouchStart(e) {
 	                        _this4.startX = e.touches[0].pageX;
+	                        console.log(_this4.props.pause);
 	                        _this4.props.pause ? _this4.pausePlay.bind(_this4) : null;
 	                    },
 	                    onTouchMove: function onTouchMove(e) {
@@ -21602,9 +21604,10 @@
 	                        if (_this4.moveX > 0) {
 	                            _this4.turn(-1);
 	                        }
+	                        _this4.props.pause ? _this4.autoPlay.bind(_this4) : null;
 	                        setTimeout(function () {
 	                            _this.props.pause ? _this.autoPlay.bind(_this) : null;
-	                        }, 300);
+	                        }, 900);
 	                        console.log(_this4.moveX);
 	                    }
 	                },

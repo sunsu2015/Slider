@@ -47,6 +47,7 @@ export default class Slider extends Component{
         }
     }
     pausePlay(){
+        console.log('pausePlay');
         clearInterval(this.autoPlayFlag);
     }
 
@@ -57,7 +58,6 @@ export default class Slider extends Component{
         console.log('componentWillReceiveProps');
     }
     render(){
-
         document.getElementsByClassName('slider')[0] && (document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = this.props.speed + "s");
         let count = this.props.items.length+2;
         let itemNodes = this.props.items.map((item,index)=>{
@@ -76,6 +76,7 @@ export default class Slider extends Component{
                 onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
                 onTouchStart={(e)=>{
                     this.startX = e.touches[0].pageX;
+                    console.log(this.props.pause);
                     this.props.pause?this.pausePlay.bind(this):null;
                 }}
                 onTouchMove={(e)=>{
@@ -95,9 +96,10 @@ export default class Slider extends Component{
                     if(this.moveX>0){
                         this.turn(-1);
                     }
+                    this.props.pause?this.autoPlay.bind(this):null;
                     setTimeout(function(){
                         _this.props.pause?_this.autoPlay.bind(_this):null;
-                    },300);
+                    },900);
                     console.log(this.moveX)
                 }}
             >
