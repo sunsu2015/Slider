@@ -21584,6 +21584,7 @@
 	                    onMouseOut: this.props.pause ? this.autoPlay.bind(this) : null,
 	                    onTouchStart: function onTouchStart(e) {
 	                        _this4.startX = e.touches[0].pageX;
+	                        _this4.props.pause ? _this4.pausePlay.bind(_this4) : null;
 	                    },
 	                    onTouchMove: function onTouchMove(e) {
 	                        _this4.endX = e.touches[0].pageX;
@@ -21594,13 +21595,16 @@
 	                    },
 	                    onTouchEnd: function onTouchEnd(e) {
 	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((_this4.endX - _this4.startX) / window.screen.width).toFixed(2)) + 's';
+	                        var _this = _this4;
 	                        if (_this4.moveX < 0) {
 	                            _this4.turn(1);
 	                        }
 	                        if (_this4.moveX > 0) {
 	                            _this4.turn(-1);
 	                        }
-	                        _this4.autoPlay.bind(_this4);
+	                        setTimeout(function () {
+	                            _this.props.pause ? _this.autoPlay.bind(_this) : null;
+	                        }, 300);
 	                        console.log(_this4.moveX);
 	                    }
 	                },

@@ -76,6 +76,7 @@ export default class Slider extends Component{
                 onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
                 onTouchStart={(e)=>{
                     this.startX = e.touches[0].pageX;
+                    this.props.pause?this.pausePlay.bind(this):null;
                 }}
                 onTouchMove={(e)=>{
                     this.endX = e.touches[0].pageX;
@@ -87,13 +88,16 @@ export default class Slider extends Component{
                 }}
                 onTouchEnd={(e)=>{
                     document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((this.endX-this.startX)/window.screen.width).toFixed(2))+'s';
+                    let _this = this;
                     if(this.moveX<0){
                         this.turn(1);
                     }
                     if(this.moveX>0){
                         this.turn(-1);
                     }
-                    this.autoPlay.bind(this);
+                    setTimeout(function(){
+                        _this.props.pause?_this.autoPlay.bind(_this):null;
+                    },300);
                     console.log(this.moveX)
                 }}
             >
