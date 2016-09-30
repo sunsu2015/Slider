@@ -16,6 +16,9 @@ export default class Slider extends Component{
     componentWillMount(){
         this.speed = this.props.speed;
         this.autoPlayFlag;
+        this.startX = 0;
+        this.endX = 0;
+        this.moveX = 0;
     }
     turn(n){
         if(n==-1){
@@ -71,6 +74,28 @@ export default class Slider extends Component{
                 className="slider"
                 onMouseOver={this.props.pause?this.pausePlay.bind(this):null}
                 onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
+                onTouchStart={(e)=>{
+                    this.startX = e.touches[0].pageX;
+                }}
+                onTouchMove={(e)=>{
+                    this.endX = e.touches[0].pageX;
+                    document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = '0s';
+                    document.getElementsByClassName('slider')[0].querySelector('ul').style.left =
+                        parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left)+((this.endX-this.startX)/window.screen.width*100)+'%';
+                    this.moveX = this.endX-this.startX;
+                    this.startX = this.endX;
+                }}
+                onTouchEnd={(e)=>{
+                    document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((this.endX-this.startX)/window.screen.width).toFixed(2))+'s';
+                    if(this.moveX<0){
+                        this.turn(1);
+                    }
+                    if(this.moveX>0){
+                        this.turn(-1);
+                    }
+                    this.autoPlay.bind(this);
+                    console.log(this.moveX)
+                }}
             >
                 <ul style={{
                     left: -100 * this.state.activeIndex + "%",

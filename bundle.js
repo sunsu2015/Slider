@@ -21509,6 +21509,9 @@
 	        value: function componentWillMount() {
 	            this.speed = this.props.speed;
 	            this.autoPlayFlag;
+	            this.startX = 0;
+	            this.endX = 0;
+	            this.moveX = 0;
 	        }
 	    }, {
 	        key: 'turn',
@@ -21578,7 +21581,28 @@
 	                {
 	                    className: 'slider',
 	                    onMouseOver: this.props.pause ? this.pausePlay.bind(this) : null,
-	                    onMouseOut: this.props.pause ? this.autoPlay.bind(this) : null
+	                    onMouseOut: this.props.pause ? this.autoPlay.bind(this) : null,
+	                    onTouchStart: function onTouchStart(e) {
+	                        _this4.startX = e.touches[0].pageX;
+	                    },
+	                    onTouchMove: function onTouchMove(e) {
+	                        _this4.endX = e.touches[0].pageX;
+	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = '0s';
+	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.left = parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left) + (_this4.endX - _this4.startX) / window.screen.width * 100 + '%';
+	                        _this4.moveX = _this4.endX - _this4.startX;
+	                        _this4.startX = _this4.endX;
+	                    },
+	                    onTouchEnd: function onTouchEnd(e) {
+	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((_this4.endX - _this4.startX) / window.screen.width).toFixed(2)) + 's';
+	                        if (_this4.moveX < 0) {
+	                            _this4.turn(1);
+	                        }
+	                        if (_this4.moveX > 0) {
+	                            _this4.turn(-1);
+	                        }
+	                        _this4.autoPlay.bind(_this4);
+	                        console.log(_this4.moveX);
+	                    }
 	                },
 	                _react2.default.createElement(
 	                    'ul',
