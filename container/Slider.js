@@ -19,40 +19,61 @@ export default class Slider extends Component{
         this.startX = 0;
         this.endX = 0;
         this.moveX = 0;
+        this.scroll = false;
     }
-    turn(n){
-        if(n==-1){
-            if(this.state.activeIndex == this.props.items.length+2-1){
-                this.setState({'activeIndex':0});
-                console.log('改变activeIndex:',0);
-                return ;
+    turn(n,flag){
+        let _fun = function(_this){
+            if(n==-1){
+                if(_this.state.activeIndex == _this.props.items.length+2-1){
+                    _this.setState({'activeIndex':0});
+                    console.log('改变activeIndex:',0);
+                    return ;
+                }
+            }
+            if(n==1){
+                if(_this.state.activeIndex == 0){
+                    _this.setState({'activeIndex':_this.props.items.length+2-1});
+                    console.log('改变activeIndex:',_this.props.items.length+2-1);
+                    return ;
+                }
+            }
+            let _n = parseInt(n+_this.state.activeIndex) ==_this.props.items.length+2 || parseInt(n+_this.state.activeIndex) ==-1?2:n+_this.state.activeIndex;
+            _this.setState({'activeIndex':_n});
+            console.log('改变activeIndex:',_n);
+        };
+        if(flag){
+            _fun(this);
+        }
+        else{
+            if(!this.scroll){
+                this.scroll = true;
+                _fun(this);
+            }
+            else{
+                let _this = this;
+                setTimeout(function(){
+                    _this.scroll = false;
+                },750);
             }
         }
-        if(n==1){
-            if(this.state.activeIndex == 0){
-                this.setState({'activeIndex':this.props.items.length+2-1});
-                console.log('改变activeIndex:',this.props.items.length+2-1);
-                return ;
-            }
-        }
-        let _n = parseInt(n+this.state.activeIndex) ==this.props.items.length+2 || parseInt(n+this.state.activeIndex) ==-1?2:n+this.state.activeIndex;
-        this.setState({'activeIndex':_n});
-        console.log('改变activeIndex:',_n);
     }
     autoPlay(){
+        console.log('autoPlay',this.props.autoplay);
         if(this.props.autoplay){
             this.autoPlayFlag = setInterval(()=>
                 {this.turn(1)},this.props.delay*1000
             );
+            console.log('autoPlay timer:',this.autoPlayFlag);
         }
     }
     pausePlay(){
-        console.log('pausePlay');
+        console.log('pausePlay timer:',this.autoPlayFlag);
         clearInterval(this.autoPlayFlag);
     }
 
     componentDidMount() {
         this.autoPlay();
+        
     }
     componentWillReceiveProps(){
         console.log('componentWillReceiveProps');
@@ -72,34 +93,42 @@ export default class Slider extends Component{
         return (
             <div
                 className="slider"
-                onMouseOver={this.props.pause?this.pausePlay.bind(this):null}
-                onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
+                // onMouseOver={this.props.pause?this.pausePlay.bind(this):null}
+                // onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
                 onTouchStart={(e)=>{
                     this.startX = e.touches[0].pageX;
                     console.log(this.props.pause);
-                    this.props.pause?this.pausePlay.bind(this):null;
+                    this.props.pause?this.pausePlay():null;
                 }}
                 onTouchMove={(e)=>{
                     this.endX = e.touches[0].pageX;
+                    this.moveX = this.endX-this.startX;
                     document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = '0s';
                     document.getElementsByClassName('slider')[0].querySelector('ul').style.left =
-                        parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left)+((this.endX-this.startX)/window.screen.width*100)+'%';
-                    this.moveX = this.endX-this.startX;
+                        parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left)+(this.moveX/window.screen.width*100)+'%';
+
                     this.startX = this.endX;
+                    console.log(this.moveX);
                 }}
                 onTouchEnd={(e)=>{
-                    document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((this.endX-this.startX)/window.screen.width).toFixed(2))+'s';
-                    let _this = this;
-                    if(this.moveX<0){
-                        this.turn(1);
+                    console.log(this.moveX);
+                    document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs((this.moveX/window.screen.width).toFixed(2))+'s';
+                    // let _this = this;
+                    if(this.moveX<-1){
+                        this.turn(1,true);
                     }
-                    if(this.moveX>0){
-                        this.turn(-1);
+                    else if(this.moveX>1){
+                        this.turn(-1,true);
                     }
-                    this.props.pause?this.autoPlay.bind(this):null;
-                    setTimeout(function(){
-                        _this.props.pause?_this.autoPlay.bind(_this):null;
-                    },900);
+                    else{
+                        document.getElementsByClassName('slider')[0].querySelector('ul').style.left =
+                            parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left)-(this.moveX/window.screen.width*100)+'%';
+                    }
+                    // this.props.pause?this.autoPlay.bind(this):null;
+                    // setTimeout(function(){
+                    //     _this.props.pause?_this.autoPlay.bind(_this):null;
+                    // },900);
+                   this.autoPlay();
                     console.log(this.moveX)
                 }}
             >
@@ -110,12 +139,12 @@ export default class Slider extends Component{
                 }}>
                     {itemNodes}
                 </ul>
-                {this.props.arrows?(<SliderArrows turn={(i)=>this.turn(i)}></SliderArrows>):null}
 
                 {this.props.dots?(<SliderDots count={count-2} activeIndex={this.state.activeIndex-1}></SliderDots>):null}
             </div>
         )
     }
+    //{this.props.arrows?(<SliderArrows turn={(i)=>this.turn(i)}></SliderArrows>):null}
     componentWillReceiveProps(){
         console.log('componentWillReceiveProps activeIndex:',this.state.activeIndex);
     }

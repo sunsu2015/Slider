@@ -21512,43 +21512,65 @@
 	            this.startX = 0;
 	            this.endX = 0;
 	            this.moveX = 0;
+	            this.scroll = false;
 	        }
 	    }, {
 	        key: 'turn',
-	        value: function turn(n) {
-	            if (n == -1) {
-	                if (this.state.activeIndex == this.props.items.length + 2 - 1) {
-	                    this.setState({ 'activeIndex': 0 });
-	                    console.log('改变activeIndex:', 0);
-	                    return;
+	        value: function turn(n, flag) {
+	            var _this3 = this;
+
+	            var _fun = function _fun(_this) {
+	                if (n == -1) {
+	                    if (_this.state.activeIndex == _this.props.items.length + 2 - 1) {
+	                        _this.setState({ 'activeIndex': 0 });
+	                        console.log('改变activeIndex:', 0);
+	                        return;
+	                    }
+	                }
+	                if (n == 1) {
+	                    if (_this.state.activeIndex == 0) {
+	                        _this.setState({ 'activeIndex': _this.props.items.length + 2 - 1 });
+	                        console.log('改变activeIndex:', _this.props.items.length + 2 - 1);
+	                        return;
+	                    }
+	                }
+	                var _n = parseInt(n + _this.state.activeIndex) == _this.props.items.length + 2 || parseInt(n + _this.state.activeIndex) == -1 ? 2 : n + _this.state.activeIndex;
+	                _this.setState({ 'activeIndex': _n });
+	                console.log('改变activeIndex:', _n);
+	            };
+	            if (flag) {
+	                _fun(this);
+	            } else {
+	                if (!this.scroll) {
+	                    this.scroll = true;
+	                    _fun(this);
+	                } else {
+	                    (function () {
+	                        var _this = _this3;
+	                        setTimeout(function () {
+	                            _this.scroll = false;
+	                        }, 750);
+	                    })();
 	                }
 	            }
-	            if (n == 1) {
-	                if (this.state.activeIndex == 0) {
-	                    this.setState({ 'activeIndex': this.props.items.length + 2 - 1 });
-	                    console.log('改变activeIndex:', this.props.items.length + 2 - 1);
-	                    return;
-	                }
-	            }
-	            var _n = parseInt(n + this.state.activeIndex) == this.props.items.length + 2 || parseInt(n + this.state.activeIndex) == -1 ? 2 : n + this.state.activeIndex;
-	            this.setState({ 'activeIndex': _n });
-	            console.log('改变activeIndex:', _n);
 	        }
 	    }, {
 	        key: 'autoPlay',
 	        value: function autoPlay() {
-	            var _this3 = this;
+	            var _this4 = this;
 
+	            console.log('autoPlay', this.props.autoplay);
 	            if (this.props.autoplay) {
 	                this.autoPlayFlag = setInterval(function () {
-	                    _this3.turn(1);
+	                    _this4.turn(1);
 	                }, this.props.delay * 1000);
+	                console.log('autoPlay timer:', this.autoPlayFlag);
 	            }
 	        }
 	    }, {
 	        key: 'pausePlay',
 	        value: function pausePlay() {
-	            console.log('pausePlay');
+	            console.log('pausePlay timer:', this.autoPlayFlag);
 	            clearInterval(this.autoPlayFlag);
 	        }
 	    }, {
@@ -21564,7 +21586,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            document.getElementsByClassName('slider')[0] && (document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = this.props.speed + "s");
 	            var count = this.props.items.length + 2;
@@ -21580,35 +21602,40 @@
 	            return _react2.default.createElement(
 	                'div',
 	                {
-	                    className: 'slider',
-	                    onMouseOver: this.props.pause ? this.pausePlay.bind(this) : null,
-	                    onMouseOut: this.props.pause ? this.autoPlay.bind(this) : null,
-	                    onTouchStart: function onTouchStart(e) {
-	                        _this4.startX = e.touches[0].pageX;
-	                        console.log(_this4.props.pause);
-	                        _this4.props.pause ? _this4.pausePlay.bind(_this4) : null;
+	                    className: 'slider'
+	                    // onMouseOver={this.props.pause?this.pausePlay.bind(this):null}
+	                    // onMouseOut={this.props.pause?this.autoPlay.bind(this):null}
+	                    , onTouchStart: function onTouchStart(e) {
+	                        _this5.startX = e.touches[0].pageX;
+	                        console.log(_this5.props.pause);
+	                        _this5.props.pause ? _this5.pausePlay() : null;
 	                    },
 	                    onTouchMove: function onTouchMove(e) {
-	                        _this4.endX = e.touches[0].pageX;
+	                        _this5.endX = e.touches[0].pageX;
+	                        _this5.moveX = _this5.endX - _this5.startX;
 	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = '0s';
-	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.left = parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left) + (_this4.endX - _this4.startX) / window.screen.width * 100 + '%';
-	                        _this4.moveX = _this4.endX - _this4.startX;
-	                        _this4.startX = _this4.endX;
+	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.left = parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left) + _this5.moveX / window.screen.width * 100 + '%';
+
+	                        _this5.startX = _this5.endX;
+	                        console.log(_this5.moveX);
 	                    },
 	                    onTouchEnd: function onTouchEnd(e) {
-	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs(((_this4.endX - _this4.startX) / window.screen.width).toFixed(2)) + 's';
-	                        var _this = _this4;
-	                        if (_this4.moveX < 0) {
-	                            _this4.turn(1);
+	                        console.log(_this5.moveX);
+	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = Math.abs((_this5.moveX / window.screen.width).toFixed(2)) + 's';
+	                        // let _this = this;
+	                        if (_this5.moveX < -1) {
+	                            _this5.turn(1, true);
+	                        } else if (_this5.moveX > 1) {
+	                            _this5.turn(-1, true);
+	                        } else {
+	                            document.getElementsByClassName('slider')[0].querySelector('ul').style.left = parseFloat(document.getElementsByClassName('slider')[0].querySelector('ul').style.left) - _this5.moveX / window.screen.width * 100 + '%';
 	                        }
-	                        if (_this4.moveX > 0) {
-	                            _this4.turn(-1);
-	                        }
-	                        _this4.props.pause ? _this4.autoPlay.bind(_this4) : null;
-	                        setTimeout(function () {
-	                            _this.props.pause ? _this.autoPlay.bind(_this) : null;
-	                        }, 900);
-	                        console.log(_this4.moveX);
+	                        // this.props.pause?this.autoPlay.bind(this):null;
+	                        // setTimeout(function(){
+	                        //     _this.props.pause?_this.autoPlay.bind(_this):null;
+	                        // },900);
+	                        _this5.autoPlay();
+	                        console.log(_this5.moveX);
 	                    }
 	                },
 	                _react2.default.createElement(
@@ -21620,12 +21647,11 @@
 	                        } },
 	                    itemNodes
 	                ),
-	                this.props.arrows ? _react2.default.createElement(_SliderArrows2.default, { turn: function turn(i) {
-	                        return _this4.turn(i);
-	                    } }) : null,
 	                this.props.dots ? _react2.default.createElement(_SliderDots2.default, { count: count - 2, activeIndex: this.state.activeIndex - 1 }) : null
 	            );
 	        }
+	        //{this.props.arrows?(<SliderArrows turn={(i)=>this.turn(i)}></SliderArrows>):null}
+
 	    }, {
 	        key: 'componentWillReceiveProps',
 	        value: function componentWillReceiveProps() {
@@ -21634,11 +21660,11 @@
 	    }, {
 	        key: 'componentDidUpdate',
 	        value: function componentDidUpdate() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            if (this.state.activeIndex == 0 || this.state.activeIndex == 4) {
 	                (function () {
-	                    var _this = _this5;
+	                    var _this = _this6;
 	                    setTimeout(function () {
 	                        console.log('延时改变DOM执行', _this.state.activeIndex);
 	                        document.getElementsByClassName('slider')[0].querySelector('ul').style.transitionDuration = '0s';
