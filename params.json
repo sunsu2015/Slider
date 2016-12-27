@@ -1,6 +1,0 @@
-{
-  "name": "Slider",
-  "tagline": "自动轮播，暂时不支持滑动",
-  "body": "React实现Banner轮播，参考了https://github.com/TongchengQiu/react-slider",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}

@@ -1,0 +1,8 @@
+title: Slider
+description: 自动轮播，暂时不支持滑动
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions

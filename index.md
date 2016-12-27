@@ -1,0 +1,1 @@
+React实现Banner轮播，参考了https://github.com/TongchengQiu/react-slider
